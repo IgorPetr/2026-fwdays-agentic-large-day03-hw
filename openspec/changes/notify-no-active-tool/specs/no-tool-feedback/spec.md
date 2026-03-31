@@ -2,13 +2,19 @@
 
 ### Requirement: Toast notification on shape tool deactivation via Escape
 
-The system SHALL display a toast notification when the user presses Escape to deactivate a shape tool (any tool not in the NON_SHAPE_TOOLS set: `"selection"`, `"lasso"`, `"eraser"`, `"hand"`, `"laser"`) via `actionDeselect`.
+The system SHALL display a toast notification when the user presses Escape to deactivate a shape tool (any tool not in the NON_SHAPE_TOOLS set: `"selection"`, `"lasso"`, `"eraser"`, `"hand"`, `"laser"`) via `actionDeselect`. The preferred selection tool is `app.state.preferredSelectionTool`, which is either `"selection"` or `"lasso"` depending on user preference.
 
 #### Scenario: User deactivates a shape tool via Escape
 
-- **GIVEN** the active tool is a shape tool (e.g., `"rectangle"`, `"ellipse"`, `"diamond"`, `"arrow"`, `"line"`, `"freedraw"`, `"text"`, `"image"`)
+- **GIVEN** the active tool is a shape tool (e.g., `"rectangle"`, `"ellipse"`, `"diamond"`, `"arrow"`, `"line"`, `"freedraw"`, `"text"`, `"image"`) and no elements are selected
 - **WHEN** the user presses the Escape key
-- **THEN** the system SHALL switch the active tool to the preferred selection tool AND display a toast notification with the `toast.toolDeactivated` message
+- **THEN** the system SHALL switch the active tool to the preferred selection tool (`"selection"` or `"lasso"`) AND display a toast notification with the `toast.toolDeactivated` message
+
+#### Scenario: User presses Escape while a shape tool is active and elements are selected
+
+- **GIVEN** the active tool is a shape tool (e.g., `"rectangle"`) and one or more elements are selected
+- **WHEN** the user presses the Escape key
+- **THEN** the system SHALL switch the active tool to the preferred selection tool, clear the element selection, AND display the tool-deactivated toast, because `actionDeselect.perform` handles tool switching, selection clearing, and toast in a single operation based on the deactivated tool type
 
 #### Scenario: User presses Escape while already in selection mode
 

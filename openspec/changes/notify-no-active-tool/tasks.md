@@ -9,8 +9,8 @@
 - [x] 2.1 Define a `NON_SHAPE_TOOLS` constant (Set or array of `"selection"`, `"lasso"`, `"eraser"`, `"hand"`, `"laser"`) near the top of `packages/excalidraw/actions/actionDeselect.ts`
 - [x] 2.2 Define a `TOAST_DURATION` constant (`3000`) near the top of `packages/excalidraw/actions/actionDeselect.ts`, replacing any magic numbers for the toast duration
 - [x] 2.3 Import `t` from `"../i18n"` in `actionDeselect.ts`
-- [x] 2.4 In `actionDeselect.perform`: after computing `activeTool` via `getNextActiveTool()`, check whether `appState.activeTool.type` (the tool being deactivated) is NOT in `NON_SHAPE_TOOLS`; if so, include `toast: { message: t("toast.toolDeactivated"), duration: TOAST_DURATION }` in both `appState` return branches (editing-group branch and default branch); otherwise set `toast: null`
-- [x] 2.5 In `actionDeselect.keyTest`: add an additional OR condition so that `actionDeselect` also triggers when `appState.toast !== null` (allowing repeated Escape to refresh the toast timer even when the tool is already the preferred selection tool)
+- [x] 2.4 In `actionDeselect.perform`: after computing `activeTool` via `getNextActiveTool()`, check whether `appState.activeTool.type` (the tool being deactivated) is NOT in `NON_SHAPE_TOOLS`; if so, include `toast: { message: t(TOOL_DEACTIVATED_TOAST_MESSAGE), duration: TOAST_DURATION }` in both `appState` return branches (editing-group branch and default branch); otherwise preserve `appState.toast` (do not clobber unrelated toasts)
+- [x] 2.5 In `actionDeselect.keyTest`: add an additional OR condition so that `actionDeselect` also triggers when `appState.toast?.message === t(TOOL_DEACTIVATED_TOAST_MESSAGE)` (allowing repeated Escape to refresh the tool-deactivated toast timer without triggering on unrelated toasts)
 
 ## 3. Testing in `tool.test.tsx`
 
