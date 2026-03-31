@@ -1,4 +1,4 @@
-# ADDED Requirements
+## ADDED Requirements
 
 ### Requirement: Toast notification on shape tool deactivation via Escape
 
