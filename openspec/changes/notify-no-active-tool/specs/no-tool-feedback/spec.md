@@ -1,52 +1,53 @@
-## ADDED Requirements
+# ADDED Requirements
 
-### Requirement: Toast notification on idle draw gesture
+### Requirement: Toast notification on shape tool deactivation via Escape
 
-The system SHALL display a toast notification when the user performs a draw-like gesture (click and drag) on empty canvas while the selection or lasso tool is active and no elements are hit or selected as a result.
+The system SHALL display a toast notification when the user presses Escape to deactivate a shape tool (any tool not in the NON_SHAPE_TOOLS set: `"selection"`, `"lasso"`, `"eraser"`, `"hand"`, `"laser"`) via `actionDeselect`.
 
-#### Scenario: User drags on empty canvas with selection tool active
+#### Scenario: User deactivates a shape tool via Escape
 
-- **WHEN** the active tool is `"selection"` or `"lasso"`, the user clicks and drags on an area with no elements, and no elements are selected after pointer-up
-- **THEN** the system SHALL display a toast notification with a message prompting the user to select a shape tool (e.g., "Select a shape tool to start drawing")
+- **GIVEN** the active tool is a shape tool (e.g., `"rectangle"`, `"ellipse"`, `"diamond"`, `"arrow"`, `"line"`, `"freedraw"`, `"text"`, `"image"`)
+- **WHEN** the user presses the Escape key
+- **THEN** the system SHALL switch the active tool to the preferred selection tool AND display a toast notification with the `toast.toolDeactivated` message
 
-#### Scenario: User clicks without dragging on empty canvas
+#### Scenario: User presses Escape while already in selection mode
 
-- **WHEN** the active tool is `"selection"` or `"lasso"` and the user clicks (without dragging) on empty canvas
-- **THEN** the system SHALL NOT display a toast notification, because a simple click is a normal deselect action
+- **GIVEN** the active tool is `"selection"` or `"lasso"`, no elements are selected, and no tool-deactivated toast is displayed
+- **WHEN** the user presses the Escape key
+- **THEN** the system SHALL NOT display a toast notification
 
-#### Scenario: User drags on canvas and selects existing elements
+#### Scenario: User presses Escape while a non-shape utility tool is active
 
-- **WHEN** the active tool is `"selection"` or `"lasso"`, the user clicks and drags, and one or more elements end up selected
-- **THEN** the system SHALL NOT display a toast notification, because the selection gesture succeeded
+- **GIVEN** the active tool is `"eraser"`, `"hand"`, or `"laser"`
+- **WHEN** the user presses the Escape key
+- **THEN** the system SHALL NOT display a tool-deactivated toast notification (these are non-shape tools)
 
-### Requirement: Toast throttling to prevent notification spam
+### Requirement: Repeated Escape refreshes toast timer
 
-The system SHALL throttle the no-tool-feedback toast so it does not appear more than once within a 10-second window.
+The system SHALL allow repeated Escape presses to refresh the toast auto-dismiss timer rather than stacking or ignoring subsequent presses.
 
-#### Scenario: Repeated draw gestures within cooldown period
+#### Scenario: Repeated Escape after toast is already shown
 
-- **WHEN** the user triggers the no-tool-feedback toast and then performs another idle draw gesture within 10 seconds
-- **THEN** the system SHALL NOT display a second toast notification
+- **GIVEN** the tool-deactivated toast is currently displayed from a prior Escape press
+- **WHEN** the user presses Escape again
+- **THEN** the system SHALL refresh the toast auto-dismiss timer to the full duration (3000ms) from the time of the last Escape press
 
-#### Scenario: Draw gesture after cooldown period expires
+### Requirement: Toast auto-dismisses after configured duration
 
-- **WHEN** the user triggers the no-tool-feedback toast and then performs another idle draw gesture after 10 or more seconds
-- **THEN** the system SHALL display the toast notification again
+The system SHALL auto-dismiss the tool-deactivated toast after 3000 milliseconds using the existing Toast component infrastructure.
 
-### Requirement: Toast uses existing notification infrastructure
+#### Scenario: Toast auto-dismiss
 
-The system SHALL use the existing `Toast` component and `setToast()` method to display the notification, with a short auto-dismiss duration (3000ms) and non-closable style.
-
-#### Scenario: Toast appearance and dismissal
-
-- **WHEN** the no-tool-feedback toast is displayed
-- **THEN** it SHALL auto-dismiss after 3000 milliseconds and SHALL NOT show a close button
+- **GIVEN** the tool-deactivated toast has been displayed
+- **WHEN** 3000 milliseconds have elapsed without another Escape press
+- **THEN** the system SHALL dismiss the toast notification
 
 ### Requirement: Toast message is localized
 
-The system SHALL use a localized i18n string for the toast message, with a default English translation.
+The system SHALL use the `toast.toolDeactivated` i18n key for the toast message, with a default English translation.
 
 #### Scenario: English locale toast message
 
-- **WHEN** the no-tool-feedback toast is triggered in English locale
-- **THEN** the toast message SHALL be a user-friendly English string such as "Select a shape tool to start drawing"
+- **GIVEN** the application is running in English locale
+- **WHEN** the tool-deactivated toast is triggered
+- **THEN** the toast message SHALL be "Tool deactivated — select a shape to draw"

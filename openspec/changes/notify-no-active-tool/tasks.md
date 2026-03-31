@@ -1,3 +1,5 @@
+# Tasks: Notify User When No Shape Tool Is Active
+
 ## 1. Localization
 
 - [x] 1.1 Add i18n key `toast.toolDeactivated` with English translation (e.g., "Tool deactivated — select a shape to draw") in `packages/excalidraw/locales/en.json` under the existing `toast` object (after `toast.elementLinkCopied`)

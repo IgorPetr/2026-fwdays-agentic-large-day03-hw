@@ -104,8 +104,9 @@ describe("Esc key tool deactivation toast", () => {
     expect(h.state.activeTool.type).toBe("selection");
     expect(h.state.toast).toBeNull();
 
-    // Escape in selection mode with no toast should not trigger actionDeselect
-    // toast remains null
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    expect(h.state.activeTool.type).toBe("selection");
     expect(h.state.toast).toBeNull();
   });
 
@@ -120,9 +121,13 @@ describe("Esc key tool deactivation toast", () => {
     expect(h.state.toast).not.toBeNull();
 
     act(() => {
-      vi.advanceTimersByTime(3500);
+      vi.advanceTimersByTime(2999);
     });
+    expect(h.state.toast).not.toBeNull();
 
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
     expect(h.state.toast).toBeNull();
   });
 

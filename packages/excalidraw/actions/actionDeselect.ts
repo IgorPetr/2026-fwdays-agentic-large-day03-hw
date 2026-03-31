@@ -24,6 +24,8 @@ const NON_SHAPE_TOOLS = new Set([
 
 const TOAST_DURATION = 3000;
 
+const TOOL_DEACTIVATED_TOAST_MESSAGE = "toast.toolDeactivated";
+
 const getNextActiveTool = (
   appState: Readonly<AppState>,
   app: AppClassProperties,
@@ -78,7 +80,7 @@ export const actionDeselect = register({
     const activeTool = getNextActiveTool(appState, app);
     const wasShapeTool = !NON_SHAPE_TOOLS.has(appState.activeTool.type);
     const toast = wasShapeTool
-      ? { message: t("toast.toolDeactivated"), duration: TOAST_DURATION }
+      ? { message: t(TOOL_DEACTIVATED_TOAST_MESSAGE), duration: TOAST_DURATION }
       : appState.toast;
 
     if (appState.editingGroupId) {
@@ -157,7 +159,7 @@ export const actionDeselect = register({
         !!appState.editingGroupId ||
         !!appState.selectedLinearElement ||
         isSomeElementSelected(app.scene.getNonDeletedElements(), appState) ||
-        appState.toast !== null)
+        appState.toast?.message === t(TOOL_DEACTIVATED_TOAST_MESSAGE))
     );
   },
 });
