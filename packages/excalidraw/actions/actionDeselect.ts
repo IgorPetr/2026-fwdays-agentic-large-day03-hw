@@ -10,8 +10,19 @@ import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
 import type { GroupId } from "@excalidraw/element/types";
 
 import { register } from "./register";
+import { t } from "../i18n";
 
 import type { AppClassProperties, AppState } from "../types";
+
+const NON_SHAPE_TOOLS = new Set([
+  "selection",
+  "lasso",
+  "eraser",
+  "hand",
+  "laser",
+]);
+
+const TOAST_DURATION = 3000;
 
 const getNextActiveTool = (
   appState: Readonly<AppState>,
@@ -65,6 +76,10 @@ export const actionDeselect = register({
   trackEvent: false,
   perform: (_elements, appState, _, app) => {
     const activeTool = getNextActiveTool(appState, app);
+    const wasShapeTool = !NON_SHAPE_TOOLS.has(appState.activeTool.type);
+    const toast = wasShapeTool
+      ? { message: t("toast.toolDeactivated"), duration: TOAST_DURATION }
+      : appState.toast;
 
     if (appState.editingGroupId) {
       const nonDeletedElements = app.scene.getNonDeletedElements();
@@ -101,6 +116,7 @@ export const actionDeselect = register({
           selectionElement: null,
           showHyperlinkPopup: false,
           suggestedBinding: null,
+          toast,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
@@ -118,6 +134,7 @@ export const actionDeselect = register({
         selectionElement: null,
         showHyperlinkPopup: false,
         suggestedBinding: null,
+        toast,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -139,7 +156,8 @@ export const actionDeselect = register({
         appState.activeTool.type !== app.state.preferredSelectionTool.type ||
         !!appState.editingGroupId ||
         !!appState.selectedLinearElement ||
-        isSomeElementSelected(app.scene.getNonDeletedElements(), appState))
+        isSomeElementSelected(app.scene.getNonDeletedElements(), appState) ||
+        appState.toast !== null)
     );
   },
 });
